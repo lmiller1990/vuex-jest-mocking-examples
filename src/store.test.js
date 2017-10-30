@@ -13,14 +13,29 @@ describe('actions', () => {
 
     store = new Vuex.Store({
       state: { data: {} },
-      mutations: mutations,
-      actions: {
-        getAsync: actions.getAsync
-      }
+        mutations,
+        actions
     })
   })
 
-  it('mocks an ajax calling using axios', () => {
+  it('tests with a mock commit', () => {
+    let count = 0
+    let mockCommit = () => { count += 1 }
+
+    actions.getAsync({ commit: mockCommit })
+    .then(() => expect(count).toBe(1))
+  })
+
+  it('tests using a mock mutation but real store', () => {
+    store.hotUpdate({
+      mutations: { SET_DATA: setDataMock }
+    })
+
+    return store.dispatch('getAsync')
+    .then(() => expect(setDataMock.mock.calls).toHaveLength(1))
+  })
+
+  it('tests using a mock axios and full store ', () => {
     return store.dispatch('getAsync')
       .then(() => expect(store.state.data)
         .toEqual({ title: 'Mock with Jest' } )
