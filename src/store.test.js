@@ -20,10 +20,18 @@ describe('actions', () => {
 
   it('tests with a mock commit', () => {
     let count = 0
-    let mockCommit = () => { count += 1 }
+    let data 
+
+    let mockCommit = (state, payload) => { 
+      data = payload
+      count += 1 
+    }
 
     actions.getAsync({ commit: mockCommit })
-    .then(() => expect(count).toBe(1))
+      .then(() => {
+        expect(count).toBe(1)
+        expect(data).toEqual({ title: 'Mock with Jest' })
+    })
   })
 
   it('tests using a mock mutation but real store', () => {
@@ -32,7 +40,11 @@ describe('actions', () => {
     })
 
     return store.dispatch('getAsync')
-    .then(() => expect(setDataMock.mock.calls).toHaveLength(1))
+      .then((res) => {
+        expect(setDataMock.mock.calls[0][1])
+          .toEqual({ title: 'Mock with Jest' })
+        expect(setDataMock.mock.calls).toHaveLength(1)
+      })
   })
 
   it('tests using a mock axios and full store ', () => {
